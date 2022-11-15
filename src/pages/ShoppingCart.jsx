@@ -4,7 +4,6 @@ export default class ShoppingCart extends Component {
   state = {
     data: [],
     empty: true,
-    qtd: 1,
   };
 
   componentDidMount() {
@@ -36,35 +35,52 @@ export default class ShoppingCart extends Component {
   }
 
   decreaseItem = ({ target }) => {
-    const cartData = JSON.parse(localStorage.getItem('dataCart'));
     const { id } = target;
-    const { qtd } = this.state;
-    const qtdMin = 1;
-    if (qtd > 1) {
-      const decrease = qtd - qtdMin;
-      this.setState({ qtd: decrease });
-      const index = cartData.findIndex((item) => item.name === id);
-      cartData.splice(index, 1);
-      localStorage.setItem('dataCart', JSON.stringify(cartData));
+    const { data } = this.state;
+    const searchItem = data.findIndex((item) => item.name === id);
+    if (data[searchItem].numero > 1) {
+      data[searchItem].numero -= 1;
+      if (data !== null) {
+        this.setState({
+          data,
+        });
+        localStorage.setItem('dataCart', JSON.stringify(data));
+      }
+    }
+  };
+
+  removeItem = ({ target }) => {
+    const { id } = target;
+    const { data } = this.state;
+    const searchItem = data.filter((item) => item.name !== id);
+    if (data !== null) {
+      this.setState({
+        data: searchItem,
+      });
+      localStorage.setItem('dataCart', JSON.stringify(data));
     }
   };
 
   increaseItem = ({ target }) => {
-    const cartData = JSON.parse(localStorage.getItem('dataCart'));
+    const { data } = this.state;
     const { id } = target;
-    const { qtd } = this.state;
-    const decrease = qtd + 1;
-    this.setState({ qtd: decrease });
-
-    const index = cartData.filter((item) => item.name === id);
-    cartData.push(index[0]);
-    localStorage.setItem('dataCart', JSON.stringify(cartData));
+    const searchItem = data.findIndex((item) => item.name === id);
+    if (data[searchItem].numero >= 1) {
+      data[searchItem].numero += 1;
+      if (data !== null) {
+        this.setState({
+          data,
+        });
+        localStorage.setItem('dataCart', JSON.stringify(data));
+      }
+    }
   };
 
   render() {
-    const { data, empty, qtd } = this.state;
+    const { data, empty } = this.state;
     return (
       <div>
+
         <h2>Shopping Cart</h2>
         {
           empty ? (
@@ -100,8 +116,10 @@ export default class ShoppingCart extends Component {
                     <span
                       id={ item.name }
                       data-testid="shopping-cart-product-quantity"
+                      // onChange={ }
                     >
-                      { qtd }
+                      { item.numero }
+
                     </span>
 
                     <button
